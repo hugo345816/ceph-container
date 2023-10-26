@@ -84,7 +84,19 @@ for flavor in $flavors_to_build; do
       # Just echo the make command we would've executed if this is a dry run
       dry_run_info "${make_cmd}"
     fi
-    do_push "${full_build_tag}"
+    if [ $STAGING = true ] ; then
+      if [ -z "$FULL_BUILD_TAG_TMPFILE" ] ; then
+        echo "FULL_BUILD_TAG_TMPFILE not passed, can't pass back container tag name"
+      else
+        echo "${full_build_tag}" > $FULL_BUILD_TAG_TMPFILE
+      fi
+      continue
+    fi
+    if [ $TEST_BUILD_ONLY = true ] ; then
+      echo "would push ${full_build_tag}"
+    else
+      do_push "${full_build_tag}"
+    fi
   done  # for version in ${ceph_version_list}
 
 done  # for flavor in $flavors_to_build
