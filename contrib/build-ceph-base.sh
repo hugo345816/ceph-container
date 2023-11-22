@@ -84,7 +84,7 @@ for flavor in $flavors_to_build; do
       # Just echo the make command we would've executed if this is a dry run
       dry_run_info "${make_cmd}"
     fi
-    if [ $STAGING = true ] ; then
+    if [ $PRERELEASE = true ] ; then
       if [ -z "$FULL_BUILD_TAG_TMPFILE" ] ; then
         echo "FULL_BUILD_TAG_TMPFILE not passed, can't pass back container tag name"
       else

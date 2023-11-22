@@ -226,8 +226,8 @@ function get_ceph_download_url () {
     *)
       error "get_ceph_download_url - unknown distro '${distro}''"
   esac
-  if [ $STAGING = true ] ; then
-    echo "https://$STAGING_USERNAME:$STAGING_PASSWORD@download.ceph.com/staging/${flavor_path}/${arch}/"
+  if [ $PRERELEASE = true ] ; then
+    echo "https://$PRERELEASE_USERNAME:$PRERELEASE_PASSWORD@download.ceph.com/prerelease/${flavor_path}/${arch}/"
   else
     echo "https://download.ceph.com/${flavor_path}/${arch}/"
   fi
