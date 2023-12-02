@@ -52,7 +52,8 @@ ALL_BUILDABLE_FLAVORS := \
 	pacific,centos,8 \
 	quincy,centos,8 \
 	reef,centos,8 \
-	main,centos,8
+	main,centos,8 \
+	main,centos,9
 
 # ==============================================================================
 # Build targets
