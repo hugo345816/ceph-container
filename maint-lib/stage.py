@@ -10,13 +10,15 @@ import time
 from collections import OrderedDict
 
 from stagelib.envglobals import (verifyRequiredEnvVars, verifyRequiredEnvVar, getEnvVar,
-                                 exportGitInfoEnvVars, exportGoArchEnvVar, exportBaseImageEnvVar)
+                                 exportGitInfoEnvVars, exportGoArchEnvVar, exportBaseImageEnvVar,
+                                 exportMirrorEnvVar)
 from stagelib.filetools import (list_files, mkdir_if_dne, copy_files, recursive_copy_dir,
                                 IOOSErrorGracefulFail, save_files_copied)
 from stagelib.replace import do_variable_replace
 
 
 # Set default values for tunables (primarily only interesting for testing)
+# 设置可调值的默认值（主要只对测试感兴趣）
 CORE_FILES_DIR = "src"
 CEPH_RELEASES_DIR = "ceph-releases"
 
@@ -24,9 +26,9 @@ CEPH_RELEASES_DIR = "ceph-releases"
 STAGING_DIR = getEnvVar('STAGING_DIR')
 # Start with empty staging dir so there are no previous artifacts
 try:
-    if os.path.isdir(STAGING_DIR):
+    if os.path.isdir(STAGING_DIR):          # 如果目录已经存在，则删除它
         shutil.rmtree(STAGING_DIR)
-    os.makedirs(STAGING_DIR, mode=0o755)
+    os.makedirs(STAGING_DIR, mode=0o755)    # 然后再创建新的
 except (OSError, IOError) as o:
     IOOSErrorGracefulFail(
         o, 'Could not delete and recreate staging dir: {}'.format(STAGING_DIR))
@@ -35,11 +37,15 @@ except (OSError, IOError) as o:
 LOG_FILE = os.path.join(STAGING_DIR, "stage.log")
 loglevel = logging.INFO
 # If DEBUG env var is set to anything (including empty string) except '0', log debug text
+# 如果环境变量`DEBUG`被设置为除`0`之外的任何值（包括空字符串），则记录调试文本。
 if 'DEBUG' in os.environ and not os.environ['DEBUG'] == '0':
     loglevel = logging.DEBUG
-logging.basicConfig(filename=LOG_FILE, level=loglevel, format='%(levelname)5s:  %(message)s')
+# logging.basicConfig(filename=LOG_FILE, level=loglevel, format='%(levelname)5s:  %(message)s')
+# 改为输出到控制台
+logging.basicConfig(level=loglevel, format='%(levelname)5s:  %(message)s')
 
 # Build dependency on python3 for `replace.py`. Looking to py2.7 deprecation in 2020.
+# 只支持Python3
 if sys.version_info[0] < 3:
     print('This must be run with Python 3+')
     sys.exit(1)
@@ -50,10 +56,11 @@ def main(CORE_FILES_DIR, CEPH_RELEASES_DIR):
     logging.info('Start time: {}'.format(time.ctime()))
 
     print('')
-    verifyRequiredEnvVars()
+    verifyRequiredEnvVars() # 验证是否设置了所有必需的环境变量。错误，如果未设置则退出。
     print('')
 
     # Treat BASE_IMAGE as required var
+    # 将 BASE_IMAGE 视为所需变量
     print('Computed:')
     logging.info('Computed:')
     exportBaseImageEnvVar()
@@ -74,6 +81,17 @@ def main(CORE_FILES_DIR, CEPH_RELEASES_DIR):
     DISTRO = getEnvVar('DISTRO')
     DISTRO_VERSION = getEnvVar('DISTRO_VERSION')
     IMAGES_TO_BUILD = getEnvVar('IMAGES_TO_BUILD').split(' ')
+
+    exportMirrorEnvVar()    # 自定义github release的下载地址
+    CENTOS_MIRROR = getEnvVar('CENTOS_MIRROR')
+    logging.info('CENTOS_MIRROR: {}'.format(CENTOS_MIRROR))
+    GITHUB_MIRROR = getEnvVar('GITHUB_MIRROR')
+    logging.info('GITHUB_MIRROR: {}'.format(GITHUB_MIRROR))
+    CEPH_MIRROR = getEnvVar('CEPH_MIRROR')
+    logging.info('CEPH_MIRROR: {}'.format(CEPH_MIRROR))
+    K8SDL__MIRROR = getEnvVar('K8SDL__MIRROR')
+    logging.info('K8SDL__MIRROR: {}'.format(K8SDL__MIRROR))
+
     # STAGING_DIR is gotten globally
 
     # Search from least specfic to most specific

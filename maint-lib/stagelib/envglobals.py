@@ -49,6 +49,8 @@ def verifyRequiredEnvVar(varname):
     Verify that an environment variable is set. Return the value of the variable if it exists.
     As these variables are required and excellent for viewing during program run, print them to
     stdout and to the log.
+    验证是否设置了环境变量。返回变量的值（如果存在）。
+    由于这些变量是必需的，并且非常适合在程序运行期间查看，请将它们打印到stdout和日志。
     """
     if varname not in os.environ:
         sys.stderr.write(_NOT_SET_TEXT.format(varname))
@@ -63,6 +65,7 @@ def verifyRequiredEnvVar(varname):
 
 def verifyRequiredEnvVars():
     """Verify that all required environment variables are set. Error and exit if one is not set."""
+    # 验证是否设置了所有必需的环境变量。如果设置错误或未设置则退出。
     for var in REQUIRED_ENV_VARS:
         verifyRequiredEnvVar(var)
 
@@ -120,3 +123,17 @@ def exportGoArchEnvVar():
         os.environ['GO_ARCH'] = _CEPH_ARCH_TO_GOLANG_ARCH_CONVERSIONS[arch]
     else:
         os.environ['GO_ARCH'] = arch
+
+def exportMirrorEnvVar():
+    """ 自定义下载地址 """
+    if "CENTOS_MIRROR" not in os.environ:
+        os.environ["CENTOS_MIRROR"] = "https://mirrors.aliyun.com"
+    if "GITHUB_MIRROR" not in os.environ:
+        # os.environ["GITHUB_MIRROR"] = "https://github.com"
+        os.environ["GITHUB_MIRROR"] = "https://mirror.ghproxy.com/https://github.com"
+    if "CEPH_MIRROR" not in os.environ:
+        # os.environ["CEPH_MIRROR"] = "https://download.ceph.com"
+        os.environ["CEPH_MIRROR"] = "https://mirrors.aliyun.com/ceph"
+    if "K8SDL__MIRROR" not in os.environ:
+        # os.environ["K8SDL__MIRROR"] = "https://storage.googleapis.com/kubernetes-release"
+        os.environ["K8SDL__MIRROR"] = "https://files.m.daocloud.io/dl.k8s.io"

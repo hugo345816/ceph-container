@@ -3,5 +3,5 @@ echo 'Web install confd' && \
       # Assume linux
       CONFD_ARCH=linux-__ENV_[GO_ARCH]__ && \
       wget -q -O /usr/local/bin/confd \
-        "https://github.com/kelseyhightower/confd/releases/download/v${CONFD_VERSION}/confd-${CONFD_VERSION}-${CONFD_ARCH}" && \
+        "__ENV_[GITHUB_MIRROR]__/kelseyhightower/confd/releases/download/v${CONFD_VERSION}/confd-${CONFD_VERSION}-${CONFD_ARCH}" && \
       chmod +x /usr/local/bin/confd && mkdir -p /etc/confd/conf.d && mkdir -p /etc/confd/templates

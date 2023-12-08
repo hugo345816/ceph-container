@@ -1,3 +1,4 @@
+set -x; \
 echo 'Install packages' && \
       yum install -y --setopt=install_weak_deps=False wget unzip util-linux python3-setuptools udev device-mapper && \
       yum install -y --setopt=install_weak_deps=False --enablerepo=powertools __DAEMON_PACKAGES__ && \

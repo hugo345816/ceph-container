@@ -49,9 +49,11 @@ ALL_BUILDABLE_FLAVORS := \
 
 # ==============================================================================
 # Build targets
+# .PHONY 关键字指示这些目标（targets）总是会被执行，而不管目标文件是否存在、是否最新。
 .PHONY: all stage build build.parallel build.all push push.parallel push.all
 
 stage.%:
+  # 生成临时目录，主要是存放Dockerfile及相关文件
 	@$(call set_env_vars,$*) sh -c maint-lib/stage.py
 
 # Make daemon-base.% and/or daemon.% target based on IMAGES_TO_BUILD setting

@@ -1,4 +1,11 @@
+set -x; \
+sed -e "s|^mirrorlist=|#mirrorlist=|g" \
+    -e "s|^#baseurl=http://mirror.centos.org/|baseurl=__ENV_[CENTOS_MIRROR]__/|g" \
+    -i /etc/yum.repos.d/CentOS-*.repo && \
 yum install -y epel-release && \
+sed -e "s|^metalink=|#metalink=|g" \
+    -e "s|^#baseurl=https://download.example/pub/|baseurl=__ENV_[CENTOS_MIRROR]__/|g" \
+    -i /etc/yum.repos.d/epel{,-modular}.repo && \
 yum install -y jq && \
 bash -c ' \
   if [ -n "__GANESHA_PACKAGES__" ]; then \
@@ -13,35 +20,35 @@ bash -c ' \
     elif [[ "${CEPH_VERSION}" == pacific ]]; then \
       echo "[ganesha]" > /etc/yum.repos.d/ganesha.repo ; \
       echo "name=ganesha" >> /etc/yum.repos.d/ganesha.repo ; \
-      echo "baseurl=https://download.ceph.com/nfs-ganesha/rpm-V3.5-stable/$CEPH_VERSION/el\$releasever/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
+      echo "baseurl=__ENV_[CEPH_MIRROR]__/nfs-ganesha/rpm-V3.5-stable/$CEPH_VERSION/el\$releasever/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "gpgcheck=1" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "enabled=1" >> /etc/yum.repos.d/ganesha.repo  ; \
       echo "[ganesha-noarch]" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "name=ganesha-noarch" >> /etc/yum.repos.d/ganesha.repo ; \
-      echo "baseurl=https://download.ceph.com/nfs-ganesha/rpm-V3.5-stable/$CEPH_VERSION/el\$releasever/noarch/" >> /etc/yum.repos.d/ganesha.repo ; \
+      echo "baseurl=__ENV_[CEPH_MIRROR]__/nfs-ganesha/rpm-V3.5-stable/$CEPH_VERSION/el\$releasever/noarch/" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "gpgcheck=1" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "enabled=1" >> /etc/yum.repos.d/ganesha.repo  ; \
     elif [[ "${CEPH_VERSION}" == octopus ]]; then \
       echo "[ganesha]" > /etc/yum.repos.d/ganesha.repo ; \
       echo "name=ganesha" >> /etc/yum.repos.d/ganesha.repo ; \
-      echo "baseurl=https://download.ceph.com/nfs-ganesha/rpm-V3.3-stable/$CEPH_VERSION/el\$releasever/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
+      echo "baseurl=__ENV_[CEPH_MIRROR]__/nfs-ganesha/rpm-V3.3-stable/$CEPH_VERSION/el\$releasever/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "gpgcheck=1" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "enabled=1" >> /etc/yum.repos.d/ganesha.repo  ; \
       echo "[ganesha-noarch]" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "name=ganesha-noarch" >> /etc/yum.repos.d/ganesha.repo ; \
-      echo "baseurl=https://download.ceph.com/nfs-ganesha/rpm-V3.3-stable/$CEPH_VERSION/el\$releasever/noarch/" >> /etc/yum.repos.d/ganesha.repo ; \
+      echo "baseurl=__ENV_[CEPH_MIRROR]__/nfs-ganesha/rpm-V3.3-stable/$CEPH_VERSION/el\$releasever/noarch/" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "gpgcheck=1" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "enabled=1" >> /etc/yum.repos.d/ganesha.repo  ; \
     elif [[ "${CEPH_VERSION}" == nautilus ]]; then \
       echo "[ganesha]" > /etc/yum.repos.d/ganesha.repo ; \
       echo "name=ganesha" >> /etc/yum.repos.d/ganesha.repo ; \
-      echo "baseurl=https://download.ceph.com/nfs-ganesha/rpm-V2.8-stable/$CEPH_VERSION/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
+      echo "baseurl=__ENV_[CEPH_MIRROR]__/nfs-ganesha/rpm-V2.8-stable/$CEPH_VERSION/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "gpgcheck=1" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "enabled=1" >> /etc/yum.repos.d/ganesha.repo  ; \
     else \
       echo "[ganesha]" > /etc/yum.repos.d/ganesha.repo ; \
       echo "name=ganesha" >> /etc/yum.repos.d/ganesha.repo ; \
-      echo "baseurl=https://download.ceph.com/nfs-ganesha/rpm-V2.7-stable/$CEPH_VERSION/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
+      echo "baseurl=__ENV_[CEPH_MIRROR]__/nfs-ganesha/rpm-V2.7-stable/$CEPH_VERSION/\$basearch/" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "gpgcheck=1" >> /etc/yum.repos.d/ganesha.repo ; \
       echo "enabled=1" >> /etc/yum.repos.d/ganesha.repo  ; \
     fi ; \
@@ -51,13 +58,13 @@ bash -c ' \
     if [[ "${CEPH_VERSION}" =~ master || "${CEPH_VERSION}" == main ]]; then \
       curl -s -L https://shaman.ceph.com/api/repos/ceph-iscsi/main/latest/centos/__ENV_[DISTRO_VERSION]__/repo -o /etc/yum.repos.d/ceph-iscsi.repo ; \
     elif [[ "${CEPH_VERSION}" =~ nautilus|octopus|pacific|quincy ]]; then \
-      curl -s -L https://download.ceph.com/ceph-iscsi/3/rpm/el__ENV_[DISTRO_VERSION]__/ceph-iscsi.repo -o /etc/yum.repos.d/ceph-iscsi.repo ; \
+      curl -s -L __ENV_[CEPH_MIRROR]__/ceph-iscsi/3/rpm/el__ENV_[DISTRO_VERSION]__/ceph-iscsi.repo -o /etc/yum.repos.d/ceph-iscsi.repo ; \
     else \
-      curl -s -L https://download.ceph.com/ceph-iscsi/2/rpm/el__ENV_[DISTRO_VERSION]__/ceph-iscsi.repo -o /etc/yum.repos.d/ceph-iscsi.repo ; \
+      curl -s -L __ENV_[CEPH_MIRROR]__/ceph-iscsi/2/rpm/el__ENV_[DISTRO_VERSION]__/ceph-iscsi.repo -o /etc/yum.repos.d/ceph-iscsi.repo ; \
     fi ; \
   fi' && \
 yum update -y --setopt=install_weak_deps=False && \
-rpm --import 'https://download.ceph.com/keys/release.asc' && \
+rpm --import '__ENV_[CEPH_MIRROR]__/keys/release.asc' && \
 if [[ "${CEPH_VERSION}" == nautilus ]]; then \
   CEPH_MGR_K8SEVENTS="ceph-mgr-k8sevents__ENV_[CEPH_POINT_RELEASE]__"; \
   if [[ -n "__ENV_[CEPH_POINT_RELEASE]__" ]]; then \
@@ -80,9 +87,12 @@ bash -c ' \
     fi ;\
   else \
     RELEASE_VER=1 ;\
-    REPO_URL="http://download.ceph.com/rpm-${CEPH_VERSION}/el__ENV_[DISTRO_VERSION]__/"; \
+    REPO_URL="__ENV_[CEPH_MIRROR]__/rpm-${CEPH_VERSION}/el__ENV_[DISTRO_VERSION]__/"; \
   fi && \
   rpm -Uvh "$REPO_URL/noarch/ceph-release-1-${RELEASE_VER}.el__ENV_[DISTRO_VERSION]__.noarch.rpm" && \
+  sed -e "s|http://download.ceph.com|__ENV_[CEPH_MIRROR]__|g" \
+      -e "s|https://download.ceph.com|__ENV_[CEPH_MIRROR]__|g" \
+      -i /etc/yum.repos.d/ceph.repo && \
   if [[ __ENV_[DISTRO_VERSION]__ -eq 8 ]]; then \
     yum install -y dnf-plugins-core ; \
     yum copr enable -y tchaikov/python-scikit-learn ; \
